@@ -1,0 +1,26 @@
+{
+  "name": "news-backend-server",
+  "version": "1.0.0",
+  "description": "Free-tier news aggregation backend with RSS, PostgreSQL FTS, Bull queues, and Groq AI",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bull": "^4.16.3",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "groq-sdk": "^0.9.1",
+    "node-cron": "^3.0.3",
+    "pg": "^8.13.1",
+    "redis": "^4.7.0",
+    "rss-parser": "^3.13.0"
+  }
+}

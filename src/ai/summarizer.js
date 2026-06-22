@@ -22,13 +22,15 @@ async function summarize(content) {
 
   try {
     const res = await client.chat.completions.create({
-      model: 'llama3-8b-8192',
+      model: 'llama-3.1-8b-instant',
       messages: [{
         role: 'user',
         content: `Summarize this news article in 2-3 sentences:\n\n${text}`,
       }],
       max_tokens: 150,
     });
+    console.error(text);
+    console.error('Groq summarization failed:', res.choices[0]?.message?.content?.trim());
     return res.choices[0]?.message?.content?.trim() || truncate(content, 200);
   } catch (err) {
     console.error('Groq summarization failed:', err.message);

@@ -4,14 +4,12 @@ const { startWorkers } = require('./queue/fetchQueue');
 const { startAiWorker } = require('./queue/aiQueue');
 
 async function main() {
-  const app = createApp();
+  const app = await createApp();
 
   app.listen(config.port, () => {
-    console.log(`News API listening on http://localhost:${config.port}`);
-    console.log(`  GET /api/news?page=1&category=tech&state=delhi&q=election`);
-    console.log(`  GET /api/search?q=cricket`);
-    console.log(`  GET /api/state/maharashtra`);
-    console.log(`  GET /api/health`);
+    console.log(`News GraphQL API listening on http://localhost:${config.port}`);
+    console.log(`  GraphQL endpoint: http://localhost:${config.port}/graphql`);
+    console.log(`  Docs / examples:  http://localhost:${config.port}/`);
   });
 
   try {

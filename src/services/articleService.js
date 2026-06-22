@@ -26,9 +26,9 @@ async function saveArticles(articles, redisClient) {
     try {
       const result = await db.query(
         `INSERT INTO articles (
-           source_id, title, slug, url, url_hash, content,
+           source_id, title, slug, url, url_hash, content,summary,
            image_url, category, state, published_at
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
          ON CONFLICT (url_hash) DO NOTHING
          RETURNING id, title, content, category, state`,
         [
@@ -38,6 +38,7 @@ async function saveArticles(articles, redisClient) {
           article.url,
           article.urlHash,
           article.content,
+          article.summary,
           article.imageUrl,
           article.category,
           article.state,
@@ -112,6 +113,24 @@ async function getArticlesByState(state, { page = 1, limit = 20 }) {
   return listArticles({ page, limit, state });
 }
 
+async function getArticleById(id) {
+  const result = await db.query(
+    `SELECT id, source_id, title, slug, url, content, summary,
+            image_url, category, state, lang, published_at, created_at
+     FROM articles WHERE id = $1`,
+    [id]
+  );
+  return result.rows[0] || null;
+}
+
+async function listSources() {
+  const result = await db.query(
+    `SELECT id, name, rss_url, category, state, active
+     FROM sources ORDER BY name`
+  );
+  return result.rows;
+}
+
 async function updateArticleAiFields(id, { summary, category, state }) {
   await db.query(
     `UPDATE articles
@@ -129,5 +148,7 @@ module.exports = {
   listArticles,
   searchArticles,
   getArticlesByState,
+  getArticleById,
+  listSources,
   updateArticleAiFields,
 };

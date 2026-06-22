@@ -1,11 +1,12 @@
 # News Backend Server
 
-Free-tier news aggregation backend: RSS ingestion, PostgreSQL full-text search, Bull job queues, Redis caching, and Groq AI summarization.
+Free-tier news aggregation backend: RSS ingestion, PostgreSQL full-text search, Bull job queues, Redis caching, Groq AI summarization, and a **GraphQL API**.
 
 ## Stack
 
 | Layer | Tech | Cost |
 |-------|------|------|
+| API | GraphQL (Apollo Server) | Free |
 | Runtime | Node.js + Express | Free |
 | Queue | Bull + Redis | Free (self-hosted) |
 | Database | PostgreSQL + FTS | Free (self-hosted) |
@@ -43,21 +44,101 @@ npm run dev
 
 The server fetches all RSS sources immediately on startup, then every 15 minutes. New articles are queued for AI summarization and classification.
 
-## API Endpoints
+## GraphQL API
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/news?page=1&limit=20&category=tech&state=delhi&q=election` | List articles with filters |
-| GET | `/api/search?q=cricket&page=1` | Full-text search (PostgreSQL FTS) |
-| GET | `/api/state/maharashtra?page=1` | Articles by Indian state |
-| GET | `/api/health` | Health check |
+**Endpoint:** `POST http://localhost:3000/graphql`
 
-### Example
+Open `http://localhost:3000/` for example queries. Use [Apollo Sandbox](https://studio.apollographql.com/sandbox) or any GraphQL client pointed at `/graphql`.
+
+### Schema overview
+
+```
+Query
+├── health                          → Health!
+├── articles(page, limit, category, state, q) → ArticleConnection!
+├── searchArticles(q, page, limit)  → ArticleConnection!
+├── articlesByState(state, page, limit) → ArticleConnection!
+├── article(id)                     → Article
+└── sources                         → [Source!]!
+```
+
+### Example queries
+
+**Health check**
+```graphql
+query {
+  health {
+    status
+    timestamp
+  }
+}
+```
+
+**Latest tech articles**
+```graphql
+query {
+  articles(limit: 5, category: "tech") {
+    page
+    limit
+    data {
+      title
+      url
+      summary
+      publishedAt
+    }
+  }
+}
+```
+
+**Search**
+```graphql
+query {
+  searchArticles(q: "cricket", limit: 5) {
+    data {
+      title
+      url
+      rank
+    }
+  }
+}
+```
+
+**Uttarakhand news**
+```graphql
+query {
+  articlesByState(state: "uttarakhand", limit: 10) {
+    data {
+      title
+      state
+      sourceId
+      summary
+    }
+  }
+}
+```
+
+**Single article + RSS sources**
+```graphql
+query {
+  article(id: "1") {
+    title
+    content
+    summary
+  }
+  sources {
+    name
+    rssUrl
+    state
+  }
+}
+```
+
+### curl example
 
 ```bash
-curl "http://localhost:3000/api/news?category=tech&limit=5"
-curl "http://localhost:3000/api/search?q=cricket"
-curl "http://localhost:3000/api/state/delhi"
+curl -X POST http://localhost:3000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ health { status timestamp } }"}'
 ```
 
 ## Project Structure
@@ -65,11 +146,12 @@ curl "http://localhost:3000/api/state/delhi"
 ```
 src/
 ├── ai/              # Groq summarizer, keyword classifier, state detector
-├── api/             # Express routes
+├── api/             # Express + Apollo Server setup
 ├── cache/           # Redis client + response caching
 ├── config/          # Env config + RSS source list
 ├── db/              # PostgreSQL pool
 ├── fetchers/        # RSS parser
+├── graphql/         # Schema, resolvers, mappers
 ├── queue/           # Bull fetch + AI workers
 ├── services/        # Article persistence and queries
 └── utils/           # Dedup, slug helpers
@@ -79,11 +161,11 @@ scripts/migrate.js   # Run migrations
 
 ## RSS Sources
 
-14 feeds configured in `src/config/sources.js`:
+Configured in `src/config/sources.js`:
 
 - **International:** BBC, Reuters
 - **India national:** The Hindu, TOI, NDTV, India Today
-- **State-wise:** TOI Mumbai, Delhi, Bangalore, Chennai
+- **State-wise:** TOI Mumbai, Delhi, Bangalore, Chennai, Dehradun + Amar Ujala/Jagran Uttarakhand
 - **Google News:** India, Tech, Sports
 
 ## AI Layer

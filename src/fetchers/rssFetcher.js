@@ -15,7 +15,18 @@ async function fetchSource(source) {
     sourceId: source.name,
     title: item.title || 'Untitled',
     url: item.link,
-    content: item.contentSnippet || item.content || item.summary || '',
+    // Short description for cards/listing
+    summary:
+      item.contentSnippet ||
+      item.summary ||
+      '',
+
+    // Full content if available
+    content:
+      item['content:encoded'] ||
+      item.content ||
+      item.contentSnippet ||
+      '',
     imageUrl: item.enclosure?.url || extractImageFromItem(item),
     publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
     urlHash: crypto.createHash('sha256').update(item.link || item.guid || item.title).digest('hex'),

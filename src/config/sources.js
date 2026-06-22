@@ -14,7 +14,24 @@ const SOURCES = [
   { name: 'TOI Delhi', url: 'https://timesofindia.indiatimes.com/rssfeeds/3908693.cms', category: 'regional', state: 'delhi' },
   { name: 'TOI Bangalore', url: 'https://timesofindia.indiatimes.com/rssfeeds/3908697.cms', category: 'regional', state: 'karnataka' },
   { name: 'TOI Chennai', url: 'https://timesofindia.indiatimes.com/rssfeeds/3908700.cms', category: 'regional', state: 'tamil-nadu' },
-
+  {
+    name: 'TOI Dehradun',
+    url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms',
+    category: 'regional',
+    state: 'uttarakhand'
+  },
+  {
+    name: 'Amar Ujala Uttarakhand',
+    url: 'https://www.amarujala.com/rss/uttarakhand-news.xml',
+    category: 'regional',
+    state: 'uttarakhand'
+  },
+  {
+    name: 'Jagran Uttarakhand',
+    url: 'https://www.jagran.com/rss/uttarakhand.xml',
+    category: 'regional',
+    state: 'uttarakhand'
+  },
   // Google News (topic-based)
   { name: 'Google-India', url: 'https://news.google.com/rss/search?q=india&hl=en-IN&gl=IN', category: 'national' },
   { name: 'Google-Tech', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pKVGlnQVAB', category: 'tech' },
